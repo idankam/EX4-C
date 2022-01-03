@@ -123,7 +123,7 @@ void create_edges_of_node(pnode *head) {
         }
         newEdge->endpoint = getNode(head, dst);
         newEdge->weight = weight; 
-        
+        newEdge->next = NULL;
         if(node->edges == NULL) { 
             node->edges = newEdge;
             currentEdge = newEdge;

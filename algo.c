@@ -17,7 +17,8 @@ void build_graph_cmd(pnode *head) {
         return;
     }
 
-    pnode tmpNode = (pnode)malloc(sizeof(node));
+    pnode tmpNode = NULL;
+    tmpNode = (pnode)malloc(sizeof(node));
     if(tmpNode == NULL) {
         printf("Not enough memory!");
         exit(0);
@@ -29,7 +30,8 @@ void build_graph_cmd(pnode *head) {
     pnode curr = tmpNode;
     
     for (int i = 1; i < number_of_nodes; i++) {
-        pnode newNode = (pnode)malloc(sizeof(node));
+        pnode newNode = NULL;
+        newNode = (pnode)malloc(sizeof(node));
         if(newNode == NULL) {
             printf("Not enough memory!");
             exit(0);
@@ -63,7 +65,8 @@ void insert_node_cmd(pnode *head) {
     getchar();
     pnode oldNode = getNode(head, id);
     if(oldNode == NULL) { 
-        pnode newNode = (pnode)malloc(sizeof(node)); 
+        pnode newNode = NULL;
+        newNode = (pnode)malloc(sizeof(node)); 
         if(newNode == NULL) {
             printf("Not enough memory!");
             exit(0);
@@ -100,9 +103,9 @@ void insert_node_cmd(pnode *head) {
     }
 
     else {
-        
-        pedge currentEdge = oldNode->edges;
-        pedge tmpPointer;
+        pedge currentEdge = NULL;
+        currentEdge = oldNode->edges;
+        pedge tmpPointer = NULL;
         while(currentEdge != NULL) {
             tmpPointer = currentEdge->next;
             free(currentEdge);
@@ -180,8 +183,8 @@ void printGraph_cmd(pnode head) {
     pnode currentNode = head;
     while(currentNode != NULL) {
         printf("\nNode %d: Edges:\t[ | ", currentNode->node_num);
-        
-        pedge currentEdge = currentNode->edges;
+        pedge currentEdge = NULL;
+        currentEdge = currentNode->edges;
         
         while(currentEdge != NULL) {
             printf("dst = %d, weight = %d | ", currentEdge->endpoint->node_num, currentEdge->weight);
@@ -202,8 +205,9 @@ void deleteGraph_cmd(pnode* head) {
     pnode nextNode;
 
     while (currentNode != NULL) {
-        pedge currentEdge = currentNode->edges;
-        pedge nextEdge;
+        pedge currentEdge = NULL;
+        currentEdge = currentNode->edges;
+        pedge nextEdge = NULL;
         
         while(currentEdge != NULL) {
             nextEdge = currentEdge->next;
@@ -273,7 +277,8 @@ void shortsPath_cmd(pnode head) {
             return;
         }
 
-        pedge currentEdge = minimumNode->edges;
+        pedge currentEdge = NULL;
+        currentEdge = minimumNode->edges;
         while(currentEdge != NULL){
             int currentNeighborWeight = currentEdge->endpoint->pathWeight;
             int minNodeWeight = minimumNode->pathWeight;
@@ -410,7 +415,8 @@ int dijkstra(pnode head, int src, int dst){
             return INT_MAX;
         }
 
-        pedge currentEdge = minimumNode->edges;
+        pedge currentEdge = NULL;
+        currentEdge = minimumNode->edges;
         while(currentEdge != NULL){
             int currentNeighborWeight = currentEdge->endpoint->pathWeight;
             int minNodeWeight = minimumNode->pathWeight;
