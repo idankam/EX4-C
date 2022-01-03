@@ -264,12 +264,12 @@ void shortsPath_cmd(pnode head) {
         
         if(minimumNode->node_num == dst){
             int dstWeight = minimumNode->pathWeight;
-            printf("Dijsktra shortest path: %d\n", dstWeight);
+            printf("Dijsktra shortest path: %d \n", dstWeight);
             return;
         }
 
         if(minimumNode->pathWeight == INT_MAX){
-            printf("Dijsktra shortest path: -1\n");
+            printf("Dijsktra shortest path: -1 \n");
             return;
         }
 
@@ -305,9 +305,9 @@ void TSP(pnode head){
     permute(cities, 0, size-1, &MINIMUM_TSP_WEIGHT, size, head);
     
     if (MINIMUM_TSP_WEIGHT == INT_MAX){
-        printf("TSP shortest path: -1\n");
+        printf("TSP shortest path: -1 \n");
     }else{
-        printf("TSP shortest path: %d\n", MINIMUM_TSP_WEIGHT);
+        printf("TSP shortest path: %d \n", MINIMUM_TSP_WEIGHT);
     }
 }
 
