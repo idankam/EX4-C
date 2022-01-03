@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "nodes.h": "c",
+        "nodes_headers.h": "c"
+    }
+}

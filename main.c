@@ -18,6 +18,8 @@ int main() {
         }
         else if(operation_char == 'B') {
             insert_node_cmd(&head);
+            // printGraph_cmd(head);
+            // printf("here");
         }
         else if(operation_char == 'D') {
             delete_node_cmd(&head);
@@ -26,7 +28,7 @@ int main() {
             shortsPath_cmd(head);
         }
         else if(operation_char == 'T') {
-            TSP_cmd(head);
+            TSP(head);
         }
         // next option
         operation_char = getchar();

@@ -3,12 +3,15 @@
 #include <ctype.h>
 #include "nodes_headers.h"
 
-void set_edges(pnode *head, pnode node){
+void set_edges(pnode *head, pnode node, int isOldNode){
     node->edges = NULL;
-    node->next = NULL;
-    pedge currentEdge;
+    //node->next = NULL;
+    if (isOldNode == 0)
+    {
+        node->next = NULL;
+    }
+    pedge currentEdge = NULL;
     
-    // char dst = getchar();
     int is_dig_flag;
     int dst;
     if (scanf("%d", &dst)){
@@ -18,19 +21,17 @@ void set_edges(pnode *head, pnode node){
         dst = (int)getchar();
         is_dig_flag = 0;
     }
-    printf("%d, %d\n", is_dig_flag, dst);
+    //printf("%d, %d\n", is_dig_flag, dst);
     getchar();
     
     while(is_dig_flag) {
         
-        //get weight from buffer
-        //int weight = (int)getchar() - '0';
         int weight;
         scanf("%d", &weight);
-        printf("%d\n", weight);
+        //printf("%d\n", weight);
         getchar();
-        
-        pedge newEdge = (pedge)malloc(sizeof(edge));
+        pedge newEdge = NULL;
+        newEdge = (pedge)malloc(sizeof(edge));
         if(newEdge == NULL) {
             printf("Not enough memory!");
             exit(0);
@@ -38,6 +39,7 @@ void set_edges(pnode *head, pnode node){
             //assign parameters
         newEdge->endpoint = getNode(head, dst);
         newEdge->weight = weight;
+        newEdge->next = NULL;
         //if first edge to link, make it the head 
         if(node->edges == NULL) {
             node->edges = newEdge;
@@ -47,6 +49,7 @@ void set_edges(pnode *head, pnode node){
             //link this edge to the end of the linked list
             currentEdge->next = newEdge;
             currentEdge = currentEdge->next;
+
         }
         
         // dst = getchar(); //get dst from buffer
@@ -60,11 +63,13 @@ void set_edges(pnode *head, pnode node){
         }
         getchar();
 
-        printf("%d, %d\n", is_dig_flag, dst);
+        //printf("%d, %d\n", is_dig_flag, dst);
     }
     // puts space and char back in buffer because its on to new command
     ungetc(' ', stdin);
     ungetc(dst, stdin);
+    //printf("%d, %d\n", is_dig_flag, dst);
+
 }
 
 pnode getNode(pnode *head, int id) {
@@ -98,7 +103,7 @@ void create_edges_of_node(pnode *head) {
         dst = (int)getchar();
         is_dig_flag = 0;
     }
-    printf("%d, %d\n", is_dig_flag, dst);
+    //printf("%d, %d\n", is_dig_flag, dst);
 
     getchar();
 
@@ -107,7 +112,7 @@ void create_edges_of_node(pnode *head) {
         int weight;
         scanf("%d", &weight);
 
-        printf("%d\n", weight);
+        //printf("%d\n", weight);
         
 
         getchar();
@@ -136,12 +141,12 @@ void create_edges_of_node(pnode *head) {
         }
         getchar();
 
-        printf("%d, %d\n", is_dig_flag, dst);
+        //printf("%d, %d\n", is_dig_flag, dst);
         
     }
 
     char next_operation = (char)dst;
-    printf("%c", next_operation);
+    //printf("%c", next_operation);
     
     ungetc(' ', stdin);
     ungetc(next_operation, stdin);

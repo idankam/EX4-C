@@ -13,12 +13,12 @@ typedef struct GRAPH_NODE_ {
     int node_num;
     pedge edges;
     struct GRAPH_NODE_ *next;
-    int priority;
-    int visited;
+    int pathWeight;
+    int isInTheQueue;
 } node, *pnode;
 
 pnode getNode(pnode *head, int id);
 void create_edges_of_node(pnode *node);
-void set_edges(pnode *head, pnode new_node);
+void set_edges(pnode *head, pnode new_node, int isOldNode);
 
 #endif

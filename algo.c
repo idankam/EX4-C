@@ -6,6 +6,7 @@
 #include "algorithms.h"
 
 
+
 void build_graph_cmd(pnode *head) {
 
     int number_of_nodes;
@@ -69,31 +70,32 @@ void insert_node_cmd(pnode *head) {
         } 
         newNode->node_num = id;
 
-        set_edges(head, newNode);
+        int notOldNode = 0;
+        set_edges(head, newNode, notOldNode);
         
         if(*head == NULL) {
             *head = newNode;
         }
         else {
-            pnode currentNnode = *head;
+            pnode currentNode = *head;
             int has_next;
-            if(currentNnode->next != NULL){
+            if(currentNode->next != NULL){
                 has_next = 1;
             }
             else{
                 has_next = 0;
             }
             while(has_next) {
-                currentNnode = currentNnode->next;
+                currentNode = currentNode->next;
 
-                if(currentNnode->next != NULL){
+                if(currentNode->next != NULL){
                     has_next = 1;
                 }
                 else{
                     has_next = 0;
                 }
             }
-            currentNnode->next = newNode;
+            currentNode->next = newNode;
         }  
     }
 
@@ -106,9 +108,10 @@ void insert_node_cmd(pnode *head) {
             free(currentEdge);
             currentEdge = tmpPointer;
         }
-        
-        set_edges(head, oldNode);
+        int isOldNode = 1;
+        set_edges(head, oldNode, isOldNode);
     }
+    
 }
 
 
@@ -135,19 +138,19 @@ void delete_node_cmd(pnode *head) {
             currentNode = currentNode->next;
         }
     }
-    pnode currentNnode = *head;
+    pnode currentNode = *head;
     pedge currentEdge = NULL;
     pedge nextEdge = NULL;
-    while(currentNnode != NULL) {
-        if (currentNnode->edges != NULL) {
+    while(currentNode != NULL) {
+        if (currentNode->edges != NULL) {
             
-            if (currentNnode->edges->endpoint == nodeToDelete) { 
-                nextEdge = currentNnode->edges->next;
-                free(currentNnode->edges);
-                currentNnode->edges = nextEdge;
+            if (currentNode->edges->endpoint == nodeToDelete) { 
+                nextEdge = currentNode->edges->next;
+                free(currentNode->edges);
+                currentNode->edges = nextEdge;
             }
             else {
-                currentEdge = currentNnode->edges;
+                currentEdge = currentNode->edges;
                 while (currentEdge->next != NULL) {
                     if (currentEdge->next->endpoint == nodeToDelete) {
                         nextEdge = currentEdge->next->next;
@@ -159,7 +162,7 @@ void delete_node_cmd(pnode *head) {
                 }
             }
         }
-        currentNnode = currentNnode->next; 
+        currentNode = currentNode->next; 
     }
     
     currentEdge = nodeToDelete->edges;
@@ -174,18 +177,18 @@ void delete_node_cmd(pnode *head) {
 }
 
 void printGraph_cmd(pnode head) {
-    pnode currentNnode = head;
-    while(currentNnode != NULL) {
-        printf("\nNode %d: Edges:\t[ | ", currentNnode->node_num);
+    pnode currentNode = head;
+    while(currentNode != NULL) {
+        printf("\nNode %d: Edges:\t[ | ", currentNode->node_num);
         
-        pedge currentEdge = currentNnode->edges;
+        pedge currentEdge = currentNode->edges;
         
         while(currentEdge != NULL) {
             printf("dst = %d, weight = %d | ", currentEdge->endpoint->node_num, currentEdge->weight);
             currentEdge = currentEdge->next;
         }
         printf("]");
-        currentNnode = currentNnode->next;
+        currentNode = currentNode->next;
     }
     putchar('\n');
 }
@@ -195,11 +198,11 @@ void deleteGraph_cmd(pnode* head) {
         return;
     }
 
-    pnode currentNnode = *head;
+    pnode currentNode = *head;
     pnode nextNode;
 
-    while (currentNnode != NULL) {
-        pedge currentEdge = currentNnode->edges;
+    while (currentNode != NULL) {
+        pedge currentEdge = currentNode->edges;
         pedge nextEdge;
         
         while(currentEdge != NULL) {
@@ -208,187 +211,217 @@ void deleteGraph_cmd(pnode* head) {
             currentEdge = nextEdge;
         }
         
-        nextNode = currentNnode->next;
-        free(currentNnode);
-        currentNnode = nextNode;
+        nextNode = currentNode->next;
+        free(currentNode);
+        currentNode = nextNode;
     }
     head = NULL;
 }
 
 void shortsPath_cmd(pnode head) {
-    //receive source and dst from buffer
-    int src = (int)getchar() - '0';
+
+    int IN_THE_QUEUE = 0, NOT_IN_THE_QUEUE = 1;
+
+    // change to scanf
+    int src, dst;
+    scanf("%d", &src);
     getchar();
-    int dst = (int)getchar() - '0';
+    scanf("%d", &dst);
     getchar();
-    pnode curr = head;
-    int counter = 0;
-    //change priority of every node to max int except for source node priority is zero
-    while(curr != NULL) {
-        if(curr->node_num != src){
-            curr->priority = INT_MAX;
+
+    pnode currentNode = head;
+    int numberOfNodes = 0; // will update in next loop
+
+    //change weight to max of each node
+    //(except for source node pathWeight is zero)
+    while(currentNode != NULL) {
+        if(currentNode->node_num != src){
+            currentNode->pathWeight = INT_MAX;
         }
         else{
-            curr->priority = 0;
+            currentNode->pathWeight = 0;
         }
-        curr->visited = 0;
-        counter++;
-        curr = curr->next;
+        currentNode->isInTheQueue = IN_THE_QUEUE;
+        numberOfNodes++;
+        currentNode = currentNode->next;
     }
-    int i = 0;
-    while(i < counter){
-        pnode smallest = NULL;
+    int roundNumber = 0;
+    while(roundNumber < numberOfNodes){
+        pnode minimumNode = NULL;
         int min_p = INT_MAX;
-        curr = head;
-        //find node with smallest priority
-        while(curr != NULL) {
-            if(curr->priority <= min_p && curr->visited == 0) {
-                min_p = curr->priority;
-                smallest = curr;
+        currentNode = head;
+
+        // find the node with the minimun weight 
+        while(currentNode != NULL) {
+            if(currentNode->pathWeight <= min_p && currentNode->isInTheQueue == IN_THE_QUEUE) {
+                min_p = currentNode->pathWeight;
+                minimumNode = currentNode;
             }
-            curr = curr->next;
+            currentNode = currentNode->next;
         }
-        //update tag visited 
-        smallest->visited = 1;
-        //if the smallest priority is int_max, then there is no path betweent the src and dst node
-        if(smallest->priority == INT_MAX){
+        //update isInTheQueue flag
+        minimumNode->isInTheQueue = NOT_IN_THE_QUEUE;
+        
+        if(minimumNode->node_num == dst){
+            int dstWeight = minimumNode->pathWeight;
+            printf("Dijsktra shortest path: %d \n", dstWeight);
+            return;
+        }
+
+        if(minimumNode->pathWeight == INT_MAX){
             printf("Dijsktra shortest path: -1 \n");
             return;
         }
-        //if the node smallest priority is the dst node then we've found our shortest path 
-        if(smallest->node_num == dst){
-            printf("Dijsktra shortest path: %d \n", smallest->priority);
-            return;
-        }
-        pedge currentEdge = smallest->edges;
-        //go through edges to check priority of neighboring nodes
+
+        pedge currentEdge = minimumNode->edges;
         while(currentEdge != NULL){
-            if(currentEdge->endpoint->priority > smallest->priority + currentEdge->weight){ //relaxing
-                currentEdge->endpoint->priority = smallest->priority + currentEdge->weight;
+            int currentNeighborWeight = currentEdge->endpoint->pathWeight;
+            int minNodeWeight = minimumNode->pathWeight;
+            int edgeToNeigborWeight = currentEdge->weight;
+            if(currentNeighborWeight > minNodeWeight + edgeToNeigborWeight){
+                currentEdge->endpoint->pathWeight = minNodeWeight + edgeToNeigborWeight;
             }
             currentEdge = currentEdge->next;
         }
-        i++;
+        roundNumber++;
     }
 }   
 
-//finds the shortest path distance that visists specific nodes on the graph
-void TSP_cmd(pnode head) {
-    int size = (int)getchar() - '0'; //get size of "list" of cities from buffer
-    getchar(); //skip spaces
+void TSP(pnode head){
+
+    int MINIMUM_TSP_WEIGHT = INT_MAX;
+
+    // size of nodes in the list
+    int size;
+    scanf("%d", &size);
+    getchar();
+
     int cities[size]; //declare size of list of nodes to visit
-    for(int i = 0; i < size; i++) { //loop size amount of times im order to add the nodes to be visited to cities
-        cities[i] = (int)getchar() - '0';
+    for(int i = 0; i < size; i++) { //loop size amount of times im order to add the nodes to be isInTheQueue to cities
+        scanf("%d", &cities[i]);
         getchar(); //skip spaces
     }
-    int min_weight = INT_MAX; //originally declare min_weight to be the highest it can be
-    for(int i = 0; i < size; i++) { //runs through every option of starter nodes
-        int new_cities[size-1];
-        int j = 0;
-        for(int k = 0; k < size; k++) {
-            if(i != k) { //j moves forward only when something is inserted, meaning i != k
-                new_cities[j++] = cities[k]; //copy over to new array
-            }
-        }
-        int weight = tsp_helper(head, cities[i], new_cities, size-1);
-        if(weight == -1) { //no path exists
-            continue;
-        }
-        if(weight < min_weight) { //we have found a smaller weight so update min_weight
-            min_weight = weight;
-        }
-    }
-    if(min_weight != INT_MAX) { //if min_weight was changed throughout the function, that is the shortest path for TSP
-        printf("TSP shortest path: %d \n", min_weight);
-    }
-    else { //if min_weight was not changed, no such path exists that visits each node in cities
-        printf("TSP shortest path: -1 \n");
+
+    permute(cities, 0, size-1, &MINIMUM_TSP_WEIGHT, size, head);
+    
+    if (MINIMUM_TSP_WEIGHT == INT_MAX){
+        printf("TSP shortest path: -1\n");
+    }else{
+        printf("TSP shortest path: %d\n", MINIMUM_TSP_WEIGHT);
     }
 }
 
-//TSP helper function that ginds the shortest path between two nodes. similar to shortest_path_cmd
-int get_shortest_path_dist(pnode head, int src, int dst) {
-    pnode curr = head;
-    int counter = 0;
-    //change priority of every node to max int except for source node priority is zero
-    while(curr != NULL) {
-        if(curr->node_num != src){
-            curr->priority = INT_MAX;
+/* Function to swap values at two pointers */
+void swap(int *x, int *y)
+{
+    int temp;
+    temp = *x;
+    *x = *y;
+    *y = temp;
+}
+ 
+/* Function to print permutations of string
+This function takes three parameters:
+1. String
+2. Starting index of the string
+3. Ending index of the string. */
+void permute(int *cities, int l, int r, int *MINIMUM_TSP_WEIGHT, int size, pnode head)
+{
+    int i;
+    if (l == r){
+        int tmpWeight = minPathWeightFotPermutation(cities, size, head);
+        if(tmpWeight < *MINIMUM_TSP_WEIGHT){
+            *MINIMUM_TSP_WEIGHT = tmpWeight;
+        }
+    }
+    else
+    {
+        for (i = l; i <= r; i++)
+        {
+            swap((cities+l), (cities+i));
+            permute(cities, l+1, r, MINIMUM_TSP_WEIGHT, size, head);
+            swap((cities+l), (cities+i)); //backtrack
+        }
+    }
+}
+
+int minPathWeightFotPermutation(int* a, int size, pnode head){
+    if (size <=1 ){
+        return 0;
+    }
+    else{
+        int sum = 0;
+        for (int i = 0; i < size-1; i++)
+        {
+            int dij = dijkstra(head, a[i], a[i+1]);
+            if (dij == INT_MAX){
+                return INT_MAX;
+            }
+            else{
+                sum += dij;
+            }
+        }
+        return sum;
+    }
+}
+
+int dijkstra(pnode head, int src, int dst){
+    int IN_THE_QUEUE = 0, NOT_IN_THE_QUEUE = 1;
+
+    pnode currentNode = head;
+    int numberOfNodes = 0; // will update in next loop
+
+    //change weight to max of each node
+    //(except for source node pathWeight is zero)
+    while(currentNode != NULL) {
+        if(currentNode->node_num != src){
+            currentNode->pathWeight = INT_MAX;
         }
         else{
-            curr->priority = 0;
+            currentNode->pathWeight = 0;
         }
-        curr->visited = 0;
-        counter++;
-        curr = curr->next;
+        currentNode->isInTheQueue = IN_THE_QUEUE;
+        numberOfNodes++;
+        currentNode = currentNode->next;
     }
-    int i = 0;
-    while(i < counter){
-        pnode smallest = NULL;
+    int roundNumber = 0;
+    while(roundNumber < numberOfNodes){
+        pnode minimumNode = NULL;
         int min_p = INT_MAX;
-        curr = head;
-        //find node with smallest priority
-        while(curr != NULL) {
-            if(curr->priority <= min_p && curr->visited == 0) {
-                min_p = curr->priority;
-                smallest = curr;
+        currentNode = head;
+
+        // find the node with the minimun weight 
+        while(currentNode != NULL) {
+            if(currentNode->pathWeight <= min_p && currentNode->isInTheQueue == IN_THE_QUEUE) {
+                min_p = currentNode->pathWeight;
+                minimumNode = currentNode;
             }
-            curr = curr->next;
+            currentNode = currentNode->next;
         }
-        //update tag visited 
-        smallest->visited = 1;
-        //if the smallest priority is int_max, then there is no path betweent the src and dst node
-        if(smallest->priority == INT_MAX){
-            return -1;
+        //update isInTheQueue flag
+        minimumNode->isInTheQueue = NOT_IN_THE_QUEUE;
+        
+        if(minimumNode->node_num == dst){
+            int dstWeight = minimumNode->pathWeight;
+            return dstWeight;
         }
-        //if the node smallest priority is the dst node then we've found our shortest path 
-        if(smallest->node_num == dst){
-            return smallest->priority;
+
+        if(minimumNode->pathWeight == INT_MAX){            
+            return INT_MAX;
         }
-        pedge currentEdge = smallest->edges;
-        //go through edges to check priority of neighboring nodes
+
+        pedge currentEdge = minimumNode->edges;
         while(currentEdge != NULL){
-            if(currentEdge->endpoint->priority > smallest->priority + currentEdge->weight){ //relaxing
-                currentEdge->endpoint->priority = smallest->priority + currentEdge->weight;
+            int currentNeighborWeight = currentEdge->endpoint->pathWeight;
+            int minNodeWeight = minimumNode->pathWeight;
+            int edgeToNeigborWeight = currentEdge->weight;
+            if(currentNeighborWeight > minNodeWeight + edgeToNeigborWeight){
+                currentEdge->endpoint->pathWeight = minNodeWeight + edgeToNeigborWeight;
             }
             currentEdge = currentEdge->next;
         }
-        i++;
+        roundNumber++;
     }
-    return -1;
-}
-
-//TSP recursive helper function
-int tsp_helper(pnode head, int src, int *cities, int size) {
-    if(size == 0) { //base case, no more options to check
-        return 0;
-    }
-    int min_weight = INT_MAX;
-    //now checking all options with specific starter node
-    for(int i = 0; i < size; i++) {
-        int new_cities[size-1];
-        int j = 0;
-        for(int k = 0; k < size; k++) {
-            if(i != k) {
-                new_cities[j++] = cities[k];
-            }
-        }
-        int edge_weight = get_shortest_path_dist(head, src, cities[i]);
-        if(edge_weight == -1) { //no path between src and dst, go to next iteration
-            continue;
-        }
-        int res = tsp_helper(head, cities[i], new_cities, size-1); //call recursively to find shortest path visiting each node in new_cities
-        if(res == -1) {
-            continue;
-        }
-        int weight = edge_weight + res; //distance from starter node to first node in new_cities + cost of path visiting each node in new_cities
-        if(weight < min_weight) { //found a smaller cost
-            min_weight = weight; //update weight
-        }
-    }
-    //min_weight was not changed so no path exists that covers every node in new_cities
-    if(min_weight == INT_MAX) {
-        return -1;
-    }
-    return min_weight; //return TSP shortes path
+    printf("here\n");
+    return INT_MAX;
 }
