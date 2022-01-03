@@ -264,12 +264,12 @@ void shortsPath_cmd(pnode head) {
         
         if(minimumNode->node_num == dst){
             int dstWeight = minimumNode->pathWeight;
-            printf("Dijsktra shortest path: %d \n", dstWeight);
+            printf("Dijsktra shortest path: %d\n", dstWeight);
             return;
         }
 
         if(minimumNode->pathWeight == INT_MAX){
-            printf("Dijsktra shortest path: -1 \n");
+            printf("Dijsktra shortest path: -1\n");
             return;
         }
 
@@ -422,6 +422,5 @@ int dijkstra(pnode head, int src, int dst){
         }
         roundNumber++;
     }
-    printf("here\n");
     return INT_MAX;
 }
