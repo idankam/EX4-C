@@ -3,9 +3,9 @@ AR = ar
 FLAGS = -Wall -g 
 OBJECTS = main.o nodes.o algo.o
 
-all: main
-main: $(OBJECTS) 
-	$(CC) $(FLAGS) -o main $(OBJECTS)
+all: graph
+graph: $(OBJECTS) 
+	$(CC) $(FLAGS) -o graph $(OBJECTS)
 main.o: main.c algorithms.h 
 	$(CC) $(FLAGS) -c main.c
 nodes.o: nodes.c nodes_headers.h 
@@ -15,4 +15,4 @@ algo.o: algo.c algorithms.h nodes_headers.h
 .PHONY:
 	all clean
 clean:
-	rm -f main *.o
+	rm -f graph *.o
